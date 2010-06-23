@@ -1,4 +1,8 @@
-.iws
-.ipr
-.iml
+.DS_Stores
+.svn
+*.iws
+*.ipr
+*.iml
 target
+.classpath
+.project
