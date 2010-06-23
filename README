@@ -1,0 +1,21 @@
+1. Module Notes
+============================
+NeoBlogger API
+- Domain Model of a fictive blogger service.
+
+NeoBlogger Service
+============================
+A working service layer for the fictive blogger service.
+
+NeoBlogger Store Neo4J
+============================
+- Store implementation based on Neo4J 1.0
+
+2. Build
+Prerequisits:
+- Using Maven 3 (probably also works with maven2).
+- Have http://m2.neo4j.org added to your Nexus group or settings.xml (release repository)
+
+Run this on the projects top level folder:
+# mvn clean install 
+
