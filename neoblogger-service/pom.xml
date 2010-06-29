@@ -3,18 +3,41 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
+    <parent>
         <groupId>neoblogger</groupId>
         <artifactId>master</artifactId>
         <version>0.1.0-SNAPSHOT</version>
         <relativePath>../poms/pom.xml</relativePath>
     </parent>
 
-  	<groupId>neoblogger</groupId>
-	<artifactId>neoblogger-service</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+    <groupId>neoblogger</groupId>
+    <artifactId>neoblogger-service</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
-	<packaging>jar</packaging>
-	<name>NeoBlogger - Service</name>
+    <packaging>jar</packaging>
+    <name>NeoBlogger - Service</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>neoblogger-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+        </dependency>
+
+        <!--
+        This dependency just exists for integration tests (Demo1) to be able to get a storage provider.
+        So, runtime dependency only!
+        -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>neoblogger-store-neo4j</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
