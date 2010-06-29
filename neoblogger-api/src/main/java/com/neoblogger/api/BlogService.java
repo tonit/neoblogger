@@ -15,7 +15,8 @@
  */
 package com.neoblogger.api;
 
-import java.util.Iterator;
+import com.neoblogger.api.primitive.Article;
+import com.neoblogger.api.primitive.Blog;
 
 /**
  * Domain Service
@@ -30,38 +31,58 @@ public interface BlogService
      * For now we just make all blogs traversable. (later)
      *
      * @return means to get the actual blogs you have at least read access to.
+     *
+     * @throws NeoBloggerAuthorizationException
+     *          raised if you are not allowed to do this action.
      */
-    Iterator<Blog> blogs();
+    Iterable<Blog> blogs()
+        throws NeoBloggerAuthorizationException;
 
     /**
      * @param blog blog that this user wants to create. He should get write access automatically.
      *
      * @return this for fluent api usage.
+     *
+     * @throws NeoBloggerAuthorizationException
+     *          raised if you are not allowed to do this action.
      */
-    BlogService createBlog( Blog blog );
+    BlogService createBlog( Blog blog )
+        throws NeoBloggerAuthorizationException;
 
     /**
      * @param blog that you want to be able to write to.
      *             Implementations may implement pending handshake for blog owners aproval.
      *
      * @return this for fluent api usage.
+     *
+     * @throws NeoBloggerAuthorizationException
+     *          raised if you are not allowed to do this action.
      */
-    BlogService registerAsAuthor( Blog blog );
+    BlogService registerAsAuthor( Blog blog )
+        throws NeoBloggerAuthorizationException;
 
     /**
      * @param blog you want to delete.
      *
      * @return this for fluent api usage.
+     *
+     * @throws NeoBloggerAuthorizationException
+     *          raised if you are not allowed to do this action.
      */
-    BlogService deleteBlog( Blog blog );
+    BlogService deleteBlog( Blog blog )
+        throws NeoBloggerAuthorizationException;
 
     /**
      * @param blogTarget blog you want to push publish the article in
      * @param article    The content that should be published.
      *
      * @return this for fluent api usage.
+     *
+     * @throws NeoBloggerAuthorizationException
+     *          raised in case you are not registered as author to blogTarget
      */
-    BlogService publishArticle( Blog blogTarget, Article article );
+    BlogService publishArticle( Blog blogTarget, Article article )
+        throws NeoBloggerAuthorizationException;
 
 
 }

@@ -15,6 +15,8 @@
  */
 package com.neoblogger.api;
 
+import com.neoblogger.api.primitive.Author;
+
 /**
  * Domain Service
  * 
