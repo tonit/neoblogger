@@ -13,12 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.neoblogger.api.primitive;
+package com.neoblogger.store.neo4j.primitive;
+
+import com.neoblogger.api.primitive.Blog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.neo4j.graphdb.Node;
 
 /**
- * Domain Entity
+ *
  */
-public interface Blog
+public class BlogImpl implements Blog
 {
 
+    private static Log LOG = LogFactory.getLog( BlogImpl.class );
+    private Node m_node;
+    public static final String ID = "id";
+
+    public BlogImpl( Node node )
+    {
+        LOG.debug( "new Blog from node " + node );
+        m_node = node;
+    }
 }

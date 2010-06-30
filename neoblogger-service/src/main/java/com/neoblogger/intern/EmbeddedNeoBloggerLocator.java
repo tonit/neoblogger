@@ -1,8 +1,7 @@
 package com.neoblogger.intern;
 
-import com.neoblogger.api.NeoBlogger;
+import com.neoblogger.api.BlogService;
 import com.neoblogger.api.NeoBloggerLocator;
-import com.neoblogger.api.NeoBloggerStorageService;
 import org.apache.commons.discovery.tools.DiscoverSingleton;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,13 +10,11 @@ public class EmbeddedNeoBloggerLocator implements NeoBloggerLocator
 {
 
     private static Log LOG = LogFactory.getLog( EmbeddedNeoBloggerLocator.class );
-    final private NeoBloggerStorageService m_store;
-    private NeoBlogger m_blogger;
+    private volatile BlogService m_service;
 
     public EmbeddedNeoBloggerLocator()
     {
-        m_store = (NeoBloggerStorageService) DiscoverSingleton.find( NeoBloggerStorageService.class );
-        m_blogger = new NeoBloggerImpl( m_store );
+
     }
 
     /**
@@ -26,29 +23,24 @@ public class EmbeddedNeoBloggerLocator implements NeoBloggerLocator
      * @return a valid neo blogger instance.
      */
     @Override
-    public NeoBlogger get()
+    public synchronized BlogService get()
     {
         LOG.debug( "Get Blogger Service" );
-        return m_blogger;
+        if( m_service == null )
+        {
+            m_service = (BlogService) DiscoverSingleton.find( BlogService.class );
+
+        }
+        return m_service;
     }
 
     @Override
-    public void detach()
+    public synchronized void detach()
     {
-        LOG.debug( "Detach Backend" );
-        m_store.close();
+        LOG.debug( "Detach" );
+        m_service.close();
+        m_service = null;
     }
 
-    private void registerShutdownHook( final NeoBloggerStorageService backend )
-    {
-        Runtime.getRuntime().addShutdownHook( new Thread()
-        {
-            @Override
-            public void run()
-            {
-                detach();
-            }
-        }
-        );
-    }
+
 }

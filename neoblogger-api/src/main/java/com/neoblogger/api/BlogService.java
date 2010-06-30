@@ -16,6 +16,7 @@
 package com.neoblogger.api;
 
 import com.neoblogger.api.primitive.Article;
+import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
 
 /**
@@ -26,6 +27,9 @@ import com.neoblogger.api.primitive.Blog;
  */
 public interface BlogService
 {
+
+    Author createAuthor( String openID, String fullname )
+        throws NeoBloggerAuthorizationException;
 
     /**
      * For now we just make all blogs traversable. (later)
@@ -38,51 +42,8 @@ public interface BlogService
     Iterable<Blog> blogs()
         throws NeoBloggerAuthorizationException;
 
-    /**
-     * @param blog blog that this user wants to create. He should get write access automatically.
-     *
-     * @return this for fluent api usage.
-     *
-     * @throws NeoBloggerAuthorizationException
-     *          raised if you are not allowed to do this action.
-     */
-    BlogService createBlog( Blog blog )
+    AuthorizedBlogService login( Author author )
         throws NeoBloggerAuthorizationException;
 
-    /**
-     * @param blog that you want to be able to write to.
-     *             Implementations may implement pending handshake for blog owners aproval.
-     *
-     * @return this for fluent api usage.
-     *
-     * @throws NeoBloggerAuthorizationException
-     *          raised if you are not allowed to do this action.
-     */
-    BlogService registerAsAuthor( Blog blog )
-        throws NeoBloggerAuthorizationException;
-
-    /**
-     * @param blog you want to delete.
-     *
-     * @return this for fluent api usage.
-     *
-     * @throws NeoBloggerAuthorizationException
-     *          raised if you are not allowed to do this action.
-     */
-    BlogService deleteBlog( Blog blog )
-        throws NeoBloggerAuthorizationException;
-
-    /**
-     * @param blogTarget blog you want to push publish the article in
-     * @param article    The content that should be published.
-     *
-     * @return this for fluent api usage.
-     *
-     * @throws NeoBloggerAuthorizationException
-     *          raised in case you are not registered as author to blogTarget
-     */
-    BlogService publishArticle( Blog blogTarget, Article article )
-        throws NeoBloggerAuthorizationException;
-
-
+    void close();
 }

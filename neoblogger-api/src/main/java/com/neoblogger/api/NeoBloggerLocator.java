@@ -6,7 +6,7 @@ package com.neoblogger.api;
 public interface NeoBloggerLocator
 {
 
-    NeoBlogger get();
+    BlogService get();
 
     void detach();
 }

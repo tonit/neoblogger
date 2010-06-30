@@ -29,7 +29,7 @@
         </dependency>
 
         <!--
-        This dependency just exists for integration tests (Demo1) to be able to get a storage provider.
+        This dependency just exists for integration tests (Demo1Test) to be able to get a storage provider.
         So, runtime dependency only!
         -->
         <dependency>
@@ -38,6 +38,7 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+       
     </dependencies>
 
 </project>

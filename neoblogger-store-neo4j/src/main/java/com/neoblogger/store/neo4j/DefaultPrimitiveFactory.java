@@ -13,12 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.neoblogger.api.primitive;
+package com.neoblogger.store.neo4j;
+
+import com.neoblogger.api.primitive.Author;
+import com.neoblogger.api.primitive.Blog;
+import com.neoblogger.store.neo4j.primitive.AuthorImpl;
+import com.neoblogger.store.neo4j.primitive.BlogImpl;
+import org.neo4j.graphdb.Node;
 
 /**
- * Domain Entity
+ * Factory for Neo4J backed primitives.
  */
-public interface Blog
+public class DefaultPrimitiveFactory implements PrimitiveFactory
 {
 
+    @Override
+    public Author getAuthor( Node node )
+    {
+        return new AuthorImpl( node );
+    }
+
+    @Override
+    public Blog getBlog( Node node )
+    {
+        return new BlogImpl( node );
+    }
 }

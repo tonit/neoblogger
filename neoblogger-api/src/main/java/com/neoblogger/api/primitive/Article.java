@@ -18,7 +18,7 @@ package com.neoblogger.api.primitive;
 /**
  * Domain Entity
  */
-public interface Article extends Primitive
+public interface Article
 {
 
 }
