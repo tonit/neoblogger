@@ -36,7 +36,7 @@ public class Neo4JBlogServiceTest
         BloggerContext ctx = mock( BloggerContext.class );
         Neo4JBlogService service = new Neo4JBlogService( ctx );
 
-        Author auth = service.registerAuthor( "foo", "bar" );
+        Author auth = service.registerAuthor( "foo" );
         assertThat( auth, is( notNullValue() ) );
 
         assertThat( service.getBlogs().iterator().hasNext(), is( false ) );

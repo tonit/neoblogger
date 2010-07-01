@@ -48,7 +48,7 @@ public class Demo1Test
         assertThat( neoBlogger.getBlogs().iterator().hasNext(), is( false ) );
 
         // interact
-        Author author = neoBlogger.registerAuthor( "donald.blogspot.com", "Donald Duck" );
+        Author author = neoBlogger.registerAuthor( "donald.blogspot.com" );
 
         neoBlogger.login( author )
             .createBlog().setTitle( "My Little Farm" );
@@ -64,7 +64,7 @@ public class Demo1Test
         BlogService neoBlogger = m_blogger.create( true );
 
         // interact
-        Author author = neoBlogger.registerAuthor( "donald.blogspot.com", "Donald Duck" );
+        Author author = neoBlogger.registerAuthor( "donald.blogspot.com" );
 
         AuthorizedBlogService s = neoBlogger.login( author );
         assertThat( s.getArticles().iterator().hasNext(), is( false ) );
@@ -82,8 +82,8 @@ public class Demo1Test
         BlogService neoBlogger = m_blogger.create( true );
 
         // interact
-        Author author = neoBlogger.registerAuthor( "donald.blogspot.com", "Donald Duck" );
-        
+        Author author = neoBlogger.registerAuthor( "donald.blogspot.com" );
+
         AuthorizedBlogService authorizedService = neoBlogger.login( author );
         Blog myOSSBlog = authorizedService.createBlog().setTitle( "My OSS Blog" );
         Blog myCompanyBlog = authorizedService.createBlog().setTitle( "My Company Blog" );
