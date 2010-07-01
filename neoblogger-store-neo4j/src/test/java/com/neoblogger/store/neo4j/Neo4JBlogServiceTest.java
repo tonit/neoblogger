@@ -16,6 +16,7 @@
 package com.neoblogger.store.neo4j;
 
 import com.neoblogger.api.primitive.Author;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.*;
@@ -30,6 +31,7 @@ public class Neo4JBlogServiceTest
 {
 
     @Test
+    @Ignore
     public void initialStateAndBehaviour()
         throws Exception
     {
@@ -44,6 +46,7 @@ public class Neo4JBlogServiceTest
     }
 
     @Test( expected = AssertionError.class )
+    @Ignore
     public void wrongLogin()
         throws Exception
     {
