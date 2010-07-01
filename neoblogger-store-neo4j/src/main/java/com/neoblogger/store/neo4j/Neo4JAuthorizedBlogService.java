@@ -58,11 +58,7 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     public AuthorizedBlogService deleteBlog( Blog blog )
         throws NeoBloggerAuthorizationException
     {
-        // detach all relationships we know if
-
-        // try to delete the node:
-
-        // if this fails we know there are dependencies on this blog that we cannot judge about ( inherent safety-net )
+        remove( blog );
         return this;
     }
 
@@ -70,8 +66,8 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     public AuthorizedBlogService publishArticle( Blog blogTarget, Article article )
         throws NeoBloggerAuthorizationException
     {
-        Node start = convert( article ).getNode();
-        Node end = convert( blogTarget ).getNode();
+        Node start = m_context.getPrimitiveFactory().get( article );
+        Node end = m_context.getPrimitiveFactory().get( blogTarget );
         Transaction tx = m_context.getDatabaseService().beginTx();
         try
         {
@@ -107,14 +103,14 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     @Override
     public Iterable<Article> getArticles()
     {
-        Node authorNode = convert( m_author ).getNode();
+        Node authorNode = m_context.getPrimitiveFactory().get( m_author );
         return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( authorNode, TraversalHelper.directChilds( Direction.OUTGOING, BloggerRelationship.CREATED ) ) );
     }
 
     @Override
     public Iterable<Article> getArticles( Blog blog )
     {
-        Node blogNode = convert( blog ).getNode();
+        Node blogNode = m_context.getPrimitiveFactory().get( blog );
         return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( blogNode, TraversalHelper.directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
     }
 
@@ -122,6 +118,12 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     public AuthorizedBlogService deleteArticle( Article article )
     {
         // delete all edges
+        remove( article );
+        return this;
+    }
+
+    private void remove( BloggerPrimitive article )
+    {
         Transaction tx = m_context.getDatabaseService().beginTx();
         try
         {
@@ -149,7 +151,6 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
         {
             tx.finish();
         }
-        return this;
     }
 
     @Override
@@ -163,7 +164,7 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
 
             m_context.getArticleReferenceNode().createRelationshipTo( node, BloggerRelationship.ARTICLE );
 
-            convert( m_author ).getNode().createRelationshipTo( node, BloggerRelationship.CREATED );
+            m_context.getPrimitiveFactory().get( m_author ).createRelationshipTo( node, BloggerRelationship.CREATED );
             article = m_context.getPrimitiveFactory().get( Article.class, node );
             tx.success();
         } finally
@@ -173,13 +174,4 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
 
         return article;
     }
-
-    // TODO make converting BloggerPromitive back to NodePojo more transparent    
-
-    private NodePojo convert( BloggerPrimitive p )
-    {
-        return ( (NodePojo) p );
-    }
-
-
 }
