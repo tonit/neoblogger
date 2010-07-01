@@ -28,14 +28,22 @@ import com.neoblogger.store.neo4j.util.TraversalHelper;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Position;
+import org.neo4j.graphdb.traversal.PruneEvaluator;
+import org.neo4j.graphdb.traversal.ReturnFilter;
+import org.neo4j.kernel.TraversalFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Neo4J based authorized service layer.
  */
 public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
 {
+
+    private static Logger LOG = LoggerFactory.getLogger( Neo4JAuthorizedBlogService.class );
 
     final private BloggerContext m_context;
     final private Author m_author;
@@ -108,6 +116,40 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     {
         Node blogNode = convert( blog ).getNode();
         return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( blogNode, TraversalHelper.directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
+    }
+
+    @Override
+    public AuthorizedBlogService deleteArticle( Article article )
+    {
+        // delete all edges
+        Transaction tx = m_context.getDatabaseService().beginTx();
+        try
+        {
+            Node node = m_context.getPrimitiveFactory().get( article );
+
+            for( Position p : TraversalFactory.createTraversalDescription()
+                .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
+                .prune( TraversalFactory.pruneAfterDepth( 1 ) )
+                .filter( ReturnFilter.ALL_BUT_START_NODE )
+                .traverse( node ) )
+            {
+                Node n = p.node();
+                for( Relationship r : n.getRelationships() )
+                {
+                    // TODO evaluate relationships. If there is anything we don't know of, cancel delete action.
+                    r.delete();
+                }
+
+            }
+            node.delete();
+
+            tx.success();
+        }
+        finally
+        {
+            tx.finish();
+        }
+        return this;
     }
 
     @Override

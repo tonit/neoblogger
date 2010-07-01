@@ -53,4 +53,6 @@ public interface AuthorizedBlogService
      * @return All articles that are attached to this blog
      */
     Iterable<Article> getArticles( Blog blog );
+
+    AuthorizedBlogService deleteArticle( Article article );
 }

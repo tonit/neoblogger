@@ -32,6 +32,8 @@ import static org.junit.Assert.*;
 
 /**
  * Demo of service layer including real backend to show off the red path without a UI
+ *
+ * System Tests
  */
 public class Demo1Test
 {
@@ -101,6 +103,57 @@ public class Demo1Test
         // but not on the other blog
         assertThat( authorizedService.getArticles( myCompanyBlog ).iterator().hasNext(), is( false ) );
 
+    }
+
+    @Test
+    public void testPublishArticleToMultipleBlogs()
+        throws NeoBloggerAuthorizationException
+    {
+        // aquire the service
+        BlogService neoBlogger = m_blogger.create( true );
+
+        // interact
+        Author author = neoBlogger.registerAuthor( "donald.blogspot.com" );
+
+        AuthorizedBlogService authorizedService = neoBlogger.login( author );
+        Blog myOSSBlog = authorizedService.createBlog().setTitle( "My OSS Blog" );
+        Blog myCompanyBlog = authorizedService.createBlog().setTitle( "My Company Blog" );
+
+        Article article = authorizedService.createArticle().setTitle( "Hello World" );
+
+        // before publish
+        assertThat( authorizedService.getArticles( myCompanyBlog ).iterator().hasNext(), is( false ) );
+        assertThat( authorizedService.getArticles( myOSSBlog ).iterator().hasNext(), is( false ) );
+
+        authorizedService.publishArticle( myOSSBlog, article );
+        authorizedService.publishArticle( myCompanyBlog, article );
+
+        // after publish
+        assertThat( authorizedService.getArticles( myOSSBlog ).iterator().hasNext(), is( true ) );
+        assertThat( authorizedService.getArticles( myCompanyBlog ).iterator().hasNext(), is( true ) );
+
+    }
+
+    @Test
+    public void testPublishAndDeleteArticles()
+        throws NeoBloggerAuthorizationException
+    {
+        BlogService neoBlogger = m_blogger.create( true );
+        Author author = neoBlogger.registerAuthor( "donald.blogspot.com" );
+        AuthorizedBlogService authorizedService = neoBlogger.login( author );
+
+        Blog myOSSBlog = authorizedService.createBlog().setTitle( "My OSS Blog" );
+
+        Article article = authorizedService.createArticle().setTitle( "Hello World" );
+
+        authorizedService.publishArticle( myOSSBlog, article );
+
+        assertThat( authorizedService.getArticles( myOSSBlog ).iterator().hasNext(), is( true ) );
+
+        authorizedService.deleteArticle( article );
+        // after delete it
+        assertThat( "Article should not be availble anymore", authorizedService.getArticles().iterator().hasNext(), is( false ) );
+        assertThat( "Article should not be availble in blog anymore", authorizedService.getArticles( myOSSBlog ).iterator().hasNext(), is( false ) );
     }
 
     @Before
