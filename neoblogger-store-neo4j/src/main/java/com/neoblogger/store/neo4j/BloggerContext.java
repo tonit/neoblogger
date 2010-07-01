@@ -1,13 +1,37 @@
 package com.neoblogger.store.neo4j;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jul 1, 2010
- * Time: 4:05:59 PM
- * To change this template use File | Settings | File Templates.
+ * Convenience Container for Blogger Services to access the most important backend services and entities.
  */
 public interface BloggerContext
 {
+
+    /**
+     * @return valid Neo4J GraphDatabaseService
+     */
+    GraphDatabaseService getDatabaseService();
+
+    /**
+     * @return valid reference node of all {@link com.neoblogger.api.primitive.Author}-Nodes
+     */
+    Node getAuthorReferenceNode();
+
+    /**
+     * @return valid reference node of all {@link com.neoblogger.api.primitive.Blog}-Nodes
+     */
+    Node getBlogReferenceNode();
+
+    /**
+     * @return valid reference node of all {@link com.neoblogger.api.primitive.Article}-Nodes
+     */
+    Node getArticleReferenceNode();
+
+    /**
+     * @return a primitive factory
+     */
+    PrimitiveFactory getPrimitiveFactory();
 
 }

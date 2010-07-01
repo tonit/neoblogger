@@ -17,6 +17,7 @@ package com.neoblogger.store.neo4j.util;
 
 import java.util.Iterator;
 import com.neoblogger.store.neo4j.BloggerRelationship;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.traversal.Position;
 import org.neo4j.graphdb.traversal.ReturnFilter;
@@ -29,13 +30,14 @@ import org.neo4j.kernel.TraversalFactory;
 public class TraversalHelper
 {
 
-    static TraversalDescription directChilds( final BloggerRelationship type )
+    public static TraversalDescription directChilds( Direction direction, final BloggerRelationship type )
     {
         return TraversalFactory.createTraversalDescription()
             .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
             .prune( TraversalFactory.pruneAfterDepth( 1 ) )
+
             .filter( ReturnFilter.ALL_BUT_START_NODE )
-            .relationships( type );
+            .relationships( type, direction );
 
     }
 
@@ -47,7 +49,9 @@ public class TraversalHelper
             public Iterator<Position> iterator()
             {
                 return descr.traverse( startNode ).iterator();
-            };
+            }
+
+            ;
         };
     }
 }

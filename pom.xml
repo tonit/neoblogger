@@ -19,8 +19,8 @@
 			<modules>
 				<module>poms</module>
 			    <module>neoblogger-api</module>
-                <module>neoblogger-service</module>
                 <module>neoblogger-store-neo4j</module>
+                <module>neoblogger-service</module>
             </modules>
 		</profile>
 	</profiles>

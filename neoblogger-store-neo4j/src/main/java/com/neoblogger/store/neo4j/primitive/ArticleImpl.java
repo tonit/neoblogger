@@ -15,36 +15,28 @@
  */
 package com.neoblogger.store.neo4j.primitive;
 
-import com.neoblogger.api.primitive.Blog;
+import com.neoblogger.api.primitive.Article;
 import com.neoblogger.store.neo4j.NodePojo;
 import com.neoblogger.store.neo4j.util.WithTransaction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.graphdb.Transaction;
 
 /**
- *
+ * Pojo with direct underlying node
  */
-public class BlogImpl implements Blog, NodePojo
+public class ArticleImpl implements Article, NodePojo
 {
 
-    private static Logger LOG = LoggerFactory.getLogger( BlogImpl.class );
-    public static final String TITLE = "TITLE";
-
     private Node m_node;
-    private GraphDatabaseService m_service;
+    public static final String TITLE = "TITLE";
+    public static final String TEXT = "TEXT";
+    final private GraphDatabaseService m_service;
 
-    public BlogImpl( Node node, GraphDatabaseService service )
+    public ArticleImpl( Node node, GraphDatabaseService service )
     {
-        LOG.debug( "new Blog from node " + node );
         m_node = node;
         m_service = service;
-    }
-
-    public String toString()
-    {
-        return "[ BLOG node='" + m_node + "' ]";
     }
 
     @Override
@@ -54,9 +46,30 @@ public class BlogImpl implements Blog, NodePojo
     }
 
     @Override
-    public Blog setTitle( String value )
+    public Article setTitle( String value )
     {
         WithTransaction.setProperty( m_service, m_node, TITLE, value );
         return this;
     }
+
+    @Override
+    public Article setText( String value )
+    {
+        WithTransaction.setProperty( m_service, m_node, TEXT, value );
+        return this;
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return (String) m_node.getProperty( TITLE );
+    }
+
+    @Override
+    public String getText()
+    {
+        return (String) m_node.getProperty( TITLE );
+    }
+
+
 }

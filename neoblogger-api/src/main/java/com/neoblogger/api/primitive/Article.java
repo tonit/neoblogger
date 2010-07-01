@@ -18,7 +18,15 @@ package com.neoblogger.api.primitive;
 /**
  * Domain Entity
  */
-public interface Article
+public interface Article extends BloggerPrimitive
 {
+
+    Article setTitle( String value );
+
+    Article setText( String value );
+
+    String getTitle();
+
+    String getText();
 
 }

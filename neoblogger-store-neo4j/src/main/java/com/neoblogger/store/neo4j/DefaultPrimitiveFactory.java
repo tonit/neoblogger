@@ -15,27 +15,60 @@
  */
 package com.neoblogger.store.neo4j;
 
+import com.neoblogger.api.primitive.Article;
 import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
+import com.neoblogger.api.primitive.BloggerPrimitive;
+import com.neoblogger.store.neo4j.primitive.ArticleImpl;
 import com.neoblogger.store.neo4j.primitive.AuthorImpl;
 import com.neoblogger.store.neo4j.primitive.BlogImpl;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /**
  * Factory for Neo4J backed primitives.
+ * Is able to convert Primitives back and forth as long as they are produced by {@link Neo4JBlogService) and its products.
  */
 public class DefaultPrimitiveFactory implements PrimitiveFactory
 {
 
-    @Override
-    public Author getAuthor( Node node )
+    private GraphDatabaseService m_service;
+
+    /**
+     * @param dbService database service be injected into newly created primitives. This way they can participate in transaction lifecycle
+     */
+    public DefaultPrimitiveFactory( GraphDatabaseService dbService )
     {
-        return new AuthorImpl( node );
+        m_service = dbService;
     }
 
     @Override
-    public Blog getBlog( Node node )
+    public <T extends BloggerPrimitive> T get( Class<T> t, Node node )
     {
-        return new BlogImpl( node );
+        // flat type mapping, play the poor man's game. No service dynamics here.
+        if( t == Author.class )
+        {
+            return (T) new AuthorImpl( node, m_service );
+        }
+        else if( t == Blog.class )
+        {
+            return (T) new BlogImpl( node, m_service );
+        }
+        else if( t == Article.class )
+        {
+            return (T) new ArticleImpl( node, m_service );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Type " + t + " not supported by this Factory." );
+        }
+    }
+
+    @Override
+    public Node get( BloggerPrimitive primitive )
+    {
+        // assume those are valid NodePojo primitves.
+        return ( (NodePojo) primitive ).getNode();
     }
 }

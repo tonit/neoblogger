@@ -15,14 +15,35 @@
  */
 package com.neoblogger.store.neo4j.util;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jul 1, 2010
- * Time: 5:29:44 PM
- * To change this template use File | Settings | File Templates.
+ * Helper for quick transaction wrapped activities
  */
 public class WithTransaction
 {
 
+    /**
+     * Set a property on a node
+     *
+     * @param service
+     * @param node
+     * @param key
+     * @param value
+     */
+    public static void setProperty( GraphDatabaseService service, Node node, String key, String value )
+    {
+        Transaction tx = service.beginTx();
+        try
+        {
+            node.setProperty( key, value );
+            tx.success();
+        } finally
+        {
+            tx.finish();
+        }
+
+    }
 }

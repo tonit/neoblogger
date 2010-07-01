@@ -15,14 +15,61 @@
  */
 package com.neoblogger.store.neo4j;
 
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jul 1, 2010
- * Time: 4:11:37 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
-public class DefaultBloggerContext
+public class DefaultBloggerContext implements BloggerContext
 {
 
+    // Sub Reference Nodes for this Application's Primitives.
+    final private Node m_refAuthors;
+    final private Node m_refArticles;
+    final private Node m_refBlogs;
+
+    // Injected Services
+    final private GraphDatabaseService m_graphService;
+    final private PrimitiveFactory m_primitiveFactory;
+
+    public DefaultBloggerContext( GraphDatabaseService service, PrimitiveFactory primitiveFactory )
+    {
+        m_graphService = service;
+        m_refAuthors = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.AUTHORS, Direction.OUTGOING ).getEndNode();
+        m_refBlogs = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.BLOGS, Direction.OUTGOING ).getEndNode();
+        m_refArticles = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.BLOGS, Direction.OUTGOING ).getEndNode();
+        m_primitiveFactory = primitiveFactory;
+    }
+
+    @Override
+    public GraphDatabaseService getDatabaseService()
+    {
+        return m_graphService;
+    }
+
+    @Override
+    public Node getAuthorReferenceNode()
+    {
+        return m_refAuthors;
+    }
+
+    @Override
+    public Node getBlogReferenceNode()
+    {
+        return m_refBlogs;
+    }
+
+    @Override
+    public Node getArticleReferenceNode()
+    {
+        return m_refArticles;
+    }
+
+    @Override
+    public PrimitiveFactory getPrimitiveFactory()
+    {
+        return m_primitiveFactory;
+    }
 }

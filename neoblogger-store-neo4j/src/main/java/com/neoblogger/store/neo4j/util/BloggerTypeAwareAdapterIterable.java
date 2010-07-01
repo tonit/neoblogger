@@ -15,14 +15,29 @@
  */
 package com.neoblogger.store.neo4j.util;
 
+import com.neoblogger.api.primitive.BloggerPrimitive;
+import com.neoblogger.store.neo4j.PrimitiveFactory;
+import org.neo4j.graphdb.traversal.Position;
+
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jul 1, 2010
- * Time: 3:38:23 PM
- * To change this template use File | Settings | File Templates.
+ * Type infering Iterable Adapter that is specific for converting {@link  Position}s iterables to {@link BloggerPrimitive}s iterables.
  */
-public class BloggerTypeAwareAdapterIterable
+public class BloggerTypeAwareAdapterIterable<S extends Position, T extends BloggerPrimitive> extends AdapterIterable<S, T>
 {
 
+    private PrimitiveFactory m_primitiveFactory;
+    private Class<T> m_type;
+
+    public BloggerTypeAwareAdapterIterable( Class<T> type, PrimitiveFactory primitiveFactory, Iterable<S> sIterable )
+    {
+        super( sIterable );
+        m_primitiveFactory = primitiveFactory;
+        m_type = type;
+    }
+
+    @Override
+    public T convert( S source )
+    {
+        return m_primitiveFactory.get( m_type, source.node() );
+    }
 }

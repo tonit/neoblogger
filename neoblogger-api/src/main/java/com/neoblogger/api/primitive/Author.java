@@ -20,18 +20,7 @@ import com.neoblogger.api.NeoBloggerAuthorizationException;
 /**
  * Domain Entity
  */
-public interface Author
+public interface Author extends BloggerPrimitive
 {
-
-    /**
-     * @param blog that you want to be able to write to.
-     *             Implementations may implement pending handshake for blog owners aproval.
-     *
-     * @return this for fluent api usage.
-     *
-     * @throws com.neoblogger.api.NeoBloggerAuthorizationException
-     *          raised if you are not allowed to do this action.
-     */
-    Author registerAsAuthor( Blog blog )
-        throws NeoBloggerAuthorizationException;
+    
 }

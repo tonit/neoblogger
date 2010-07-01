@@ -1,23 +1,13 @@
 package com.neoblogger.api;
 
 import com.neoblogger.api.primitive.Article;
-import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jun 29, 2010
- * Time: 7:09:31 PM
- * To change this template use File | Settings | File Templates.
+ * Authorized Services. Assumes a valid author (=session) implicitly.
  */
 public interface AuthorizedBlogService
 {
-
-    /**
-     * @param id
-     */
-    Blog createBlog( String id );
 
     /**
      * @param blog you want to delete.
@@ -27,7 +17,7 @@ public interface AuthorizedBlogService
      * @throws NeoBloggerAuthorizationException
      *          raised if you are not allowed to do this action.
      */
-    BlogService deleteBlog( Blog blog )
+    AuthorizedBlogService deleteBlog( Blog blog )
         throws NeoBloggerAuthorizationException;
 
     /**
@@ -39,11 +29,28 @@ public interface AuthorizedBlogService
      * @throws NeoBloggerAuthorizationException
      *          raised in case you are not registered as author to blogTarget
      */
-    BlogService publishArticle( Blog blogTarget, Article article )
+    AuthorizedBlogService publishArticle( Blog blogTarget, Article article )
         throws NeoBloggerAuthorizationException;
 
     /**
-     * @param s
+     * Create a new Article.
      */
-    Article createArticle( String s );
+    Article createArticle();
+
+    /**
+     * Create a new Blog
+     */
+    Blog createBlog();
+
+    /**
+     * @return All articles that this user wrote
+     */
+    Iterable<Article> getArticles();
+
+    /**
+     * @param blog
+     *
+     * @return All articles that are attached to this blog
+     */
+    Iterable<Article> getArticles( Blog blog );
 }

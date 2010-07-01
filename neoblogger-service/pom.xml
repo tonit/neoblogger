@@ -29,7 +29,7 @@
         </dependency>
 
         <!--
-        This dependency just exists for integration tests (Demo1Test) to be able to get a storage provider.
+        This dependency just exists for integration tests (Demo1Test) to be able to create a storage provider.
         So, runtime dependency only!
         -->
         <dependency>
@@ -38,7 +38,13 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-       
+
+        <!-- Log Impl only for running code (tests). Not part of the lib. -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

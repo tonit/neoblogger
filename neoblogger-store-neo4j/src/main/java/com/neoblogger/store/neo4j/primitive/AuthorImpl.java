@@ -19,6 +19,7 @@ import com.neoblogger.api.NeoBloggerAuthorizationException;
 import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
 import com.neoblogger.store.neo4j.NodePojo;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -31,7 +32,7 @@ public class AuthorImpl implements Author, NodePojo
     public static final String PROPERTY_OPENID = "OPENID";
     public static final String PROPERTY_FULLNAME = "FULLNAME";
 
-    public AuthorImpl( Node node )
+    public AuthorImpl( Node node, GraphDatabaseService service )
     {
         m_node = node;
     }
@@ -45,13 +46,5 @@ public class AuthorImpl implements Author, NodePojo
     public String toString()
     {
         return "[ AUTHOR node='" + m_node + "' ]";
-    }
-
-    @Override
-    public Author registerAsAuthor( Blog blog )
-        throws NeoBloggerAuthorizationException
-    {
-
-        return this;
     }
 }

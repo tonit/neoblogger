@@ -16,54 +16,77 @@
 package com.neoblogger.store.neo4j;
 
 import com.neoblogger.api.AuthorizedBlogService;
-import com.neoblogger.api.BlogService;
 import com.neoblogger.api.NeoBloggerAuthorizationException;
 import com.neoblogger.api.primitive.Article;
 import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
-import com.neoblogger.store.neo4j.primitive.AuthorImpl;
+import com.neoblogger.api.primitive.BloggerPrimitive;
+import com.neoblogger.store.neo4j.primitive.ArticleImpl;
 import com.neoblogger.store.neo4j.primitive.BlogImpl;
+import com.neoblogger.store.neo4j.util.BloggerTypeAwareAdapterIterable;
+import com.neoblogger.store.neo4j.util.TraversalHelper;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.graphdb.traversal.Position;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jun 29, 2010
- * Time: 7:25:50 PM
- * To change this template use File | Settings | File Templates.
+ * Neo4J based authorized service layer.
  */
 public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
 {
 
-    final private GraphDatabaseService m_graphDB;
+    final private BloggerContext m_context;
     final private Author m_author;
-    final private Node m_refBlogs;
-    private PrimitiveFactory m_primitiveFactory;
 
-    public Neo4JAuthorizedBlogService( GraphDatabaseService db, Author author, Node refBlogs )
+    public Neo4JAuthorizedBlogService( BloggerContext ctx, Author author )
     {
-        m_graphDB = db;
+        m_context = ctx;
         m_author = author;
-        m_refBlogs = refBlogs;
-        m_primitiveFactory = new DefaultPrimitiveFactory();
-
-
     }
 
     @Override
-    public Blog createBlog( String id )
+    public AuthorizedBlogService deleteBlog( Blog blog )
+        throws NeoBloggerAuthorizationException
     {
-        Blog blog = null;
-        Transaction tx = m_graphDB.beginTx();
+        // detach all relationships we know if
+
+        // try to delete the node:
+
+        // if this fails we know there are dependencies on this blog that we cannot judge about ( inherent safety-net )
+        return this;
+    }
+
+    @Override
+    public AuthorizedBlogService publishArticle( Blog blogTarget, Article article )
+        throws NeoBloggerAuthorizationException
+    {
+        Node start = convert( article ).getNode();
+        Node end = convert( blogTarget ).getNode();
+        Transaction tx = m_context.getDatabaseService().beginTx();
         try
         {
-            Node node = m_graphDB.createNode();
-            node.setProperty( BlogImpl.ID, id );
-            m_refBlogs.createRelationshipTo( node, BloggerRelationship.MEMBER );
-            blog = m_primitiveFactory.getBlog( node );
+            start.createRelationshipTo( end, BloggerRelationship.PUBLISHED_TO );
+            tx.success();
+        } finally
+        {
+            tx.finish();
+        }
+
+        return this;
+    }
+
+    @Override
+    public Blog createBlog()
+    {
+        Blog blog = null;
+        Transaction tx = m_context.getDatabaseService().beginTx();
+        try
+        {
+            Node node = m_context.getDatabaseService().createNode();
+            m_context.getBlogReferenceNode().createRelationshipTo( node, BloggerRelationship.BLOG );
+            blog = m_context.getPrimitiveFactory().get( Blog.class, node );
             tx.success();
         } finally
         {
@@ -74,23 +97,46 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     }
 
     @Override
-    public BlogService deleteBlog( Blog blog )
-        throws NeoBloggerAuthorizationException
+    public Iterable<Article> getArticles()
     {
-        return null;
+        Node authorNode = convert( m_author ).getNode();
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( authorNode, TraversalHelper.directChilds( Direction.OUTGOING, BloggerRelationship.CREATED ) ) );
     }
 
     @Override
-    public BlogService publishArticle( Blog blogTarget, Article article )
-        throws NeoBloggerAuthorizationException
+    public Iterable<Article> getArticles( Blog blog )
     {
-        return null;
+        Node blogNode = convert( blog ).getNode();
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( blogNode, TraversalHelper.directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
     }
 
     @Override
-    public Article createArticle( String s )
+    public Article createArticle()
     {
-        return null;
+        Article article = null;
+        Transaction tx = m_context.getDatabaseService().beginTx();
+        try
+        {
+            Node node = m_context.getDatabaseService().createNode();
+
+            m_context.getArticleReferenceNode().createRelationshipTo( node, BloggerRelationship.ARTICLE );
+
+            convert( m_author ).getNode().createRelationshipTo( node, BloggerRelationship.CREATED );
+            article = m_context.getPrimitiveFactory().get( Article.class, node );
+            tx.success();
+        } finally
+        {
+            tx.finish();
+        }
+
+        return article;
+    }
+
+    // TODO make converting BloggerPromitive back to NodePojo more transparent    
+
+    private NodePojo convert( BloggerPrimitive p )
+    {
+        return ( (NodePojo) p );
     }
 
 

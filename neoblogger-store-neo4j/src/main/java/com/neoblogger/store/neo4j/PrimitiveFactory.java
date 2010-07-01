@@ -1,20 +1,15 @@
 package com.neoblogger.store.neo4j;
 
-import com.neoblogger.api.primitive.Author;
-import com.neoblogger.api.primitive.Blog;
+import com.neoblogger.api.primitive.BloggerPrimitive;
 import org.neo4j.graphdb.Node;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tonit
- * Date: Jun 29, 2010
- * Time: 7:23:31 PM
- * To change this template use File | Settings | File Templates.
+ * Used to Convert Application Primitives into Nodes and vice versa.
  */
 public interface PrimitiveFactory
 {
 
-    Author getAuthor( Node node );
+    <T extends BloggerPrimitive> T get( Class<T> t, Node node );
 
-    Blog getBlog( Node node );
+    Node get( BloggerPrimitive primitive );
 }

@@ -41,7 +41,7 @@ public interface NeoBlogger
     NeoBlogger unregister( Author author );
 
     /**
-     * Once logged in, you get access to the BlogService.
+     * Once logged in, you create access to the BlogService.
      *
      * @param author you want to log in
      *
