@@ -16,6 +16,7 @@
 package com.neoblogger.store.neo4j;
 
 import java.util.ArrayList;
+import com.neoblogger.api.AuthorizedBlogService;
 import com.neoblogger.api.primitive.Author;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
@@ -39,15 +40,44 @@ public class Neo4JBlogServiceTest
 {
 
     @Test
-    public void initialStateAndBehaviour()
+    public void initialGetBlogs()
         throws Exception
     {
-        Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
+        BloggerContext ctx = createDefaultMockBloggerContext();
+
+        Neo4JBlogService service = new Neo4JBlogService( ctx );
 
         Author auth = service.registerAuthor( "foo" );
         assertThat( auth, is( notNullValue() ) );
 
         assertThat( service.getBlogs().iterator().hasNext(), is( false ) );
+
+        // verify that it consults the db at least
+        verify( ctx, atLeast( 1 ) ).getDatabaseService();
+
+        // and it uses the provided ref sub node.
+        verify( ctx, atLeast( 1 ) ).getBlogReferenceNode();
+
+
+    }
+
+    @Test
+    public void testLogin()
+        throws Exception
+    {
+        BloggerContext ctx = createDefaultMockBloggerContext();
+
+        Neo4JBlogService service = new Neo4JBlogService( ctx );
+
+        AuthorizedBlogService authorized = service.login( service.registerAuthor( "foo" ) );
+
+        assertThat( authorized, is( notNullValue() ) );
+
+        // verify that it consults the db at least
+        verify( ctx, atLeast( 1 ) ).getDatabaseService();
+
+        // and it uses the provided ref sub node.
+        verify( ctx, atLeast( 1 ) ).getAuthorReferenceNode();
 
     }
 
@@ -86,12 +116,34 @@ public class Neo4JBlogServiceTest
     }
 
     @Test( expected = AssertionError.class )
-    public void wrongLogin()
+    public void checkNullDependency()
+        throws Exception
+    {
+        new Neo4JBlogService( null );
+    }
+
+    @Test( expected = AssertionError.class )
+    public void checkNullLogin()
         throws Exception
     {
         Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
-
         service.login( null );
+    }
+
+    @Test( expected = AssertionError.class )
+    public void checkNullAuthor()
+        throws Exception
+    {
+        Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
+        service.getAuthor( null );
+    }
+
+    @Test( expected = AssertionError.class )
+    public void checkNullRegister()
+        throws Exception
+    {
+        Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
+        service.registerAuthor( null );
     }
 
 }

@@ -37,6 +37,8 @@ public class Neo4JBlogService implements BlogService
 
     public Neo4JBlogService( BloggerContext ctx )
     {
+        assert ( ctx != null ) : "ctx should not be null";
+
         m_context = ctx;
     }
 
@@ -47,6 +49,8 @@ public class Neo4JBlogService implements BlogService
     public Author registerAuthor( String openID )
         throws NeoBloggerAuthorizationException
     {
+        assert ( openID != null ) : "openID should not be null";
+
         // TODO: check if author already exists using index service.
         Author author = null;
         Transaction tx = m_context.getDatabaseService().beginTx();
@@ -72,6 +76,8 @@ public class Neo4JBlogService implements BlogService
     public Author getAuthor( String openID )
         throws NeoBloggerAuthorizationException
     {
+        assert ( openID != null ) : "openID should not be null";
+
         return null;
     }
 
