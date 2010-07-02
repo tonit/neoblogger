@@ -15,9 +15,17 @@
  */
 package com.neoblogger.store.neo4j;
 
+import java.util.ArrayList;
 import com.neoblogger.api.primitive.Author;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.traversal.Position;
+import org.neo4j.graphdb.traversal.TraversalDescription;
 
 import static org.hamcrest.core.Is.*;
 import static org.hamcrest.core.IsNull.*;
@@ -31,12 +39,10 @@ public class Neo4JBlogServiceTest
 {
 
     @Test
-    @Ignore
     public void initialStateAndBehaviour()
         throws Exception
     {
-        BloggerContext ctx = mock( BloggerContext.class );
-        Neo4JBlogService service = new Neo4JBlogService( ctx );
+        Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
 
         Author auth = service.registerAuthor( "foo" );
         assertThat( auth, is( notNullValue() ) );
@@ -45,13 +51,45 @@ public class Neo4JBlogServiceTest
 
     }
 
+    private BloggerContext createDefaultMockBloggerContext()
+    {
+        BloggerContext ctx = mock( BloggerContext.class );
+
+        GraphDatabaseService db = mock( GraphDatabaseService.class );
+        Transaction transaction = mock( Transaction.class );
+
+        Node node = mock( Node.class );
+        // use real factory for type convertions.
+        PrimitiveFactory primitiveFactory = new DefaultPrimitiveFactory( db );
+        Relationship relationship = mock( Relationship.class );
+
+        NeoBloggerTraversal traversalHelper = mock( NeoBloggerTraversal.class );
+        TraversalDescription traversalDescription = mock( TraversalDescription.class );
+
+        when( traversalHelper.directChilds( any( Direction.class ), any( BloggerRelationship.class ) ) ).thenReturn( traversalDescription );
+        when( traversalHelper.traverse( any( Node.class ), any( TraversalDescription.class ) ) ).thenReturn( new ArrayList<Position>() );
+
+        when( node.createRelationshipTo( any( Node.class ), any( RelationshipType.class ) ) ).thenReturn( relationship );
+
+        when( db.beginTx() ).thenReturn( transaction );
+        when( db.createNode() ).thenReturn( node );
+
+        when( ctx.getDatabaseService() ).thenReturn( db );
+        when( ctx.getAuthorReferenceNode() ).thenReturn( node );
+        when( ctx.getBlogReferenceNode() ).thenReturn( node );
+        when( ctx.getArticleReferenceNode() ).thenReturn( node );
+        when( ctx.getPrimitiveFactory() ).thenReturn( primitiveFactory );
+
+        when( ctx.getSimplifiedTraversal() ).thenReturn( traversalHelper );
+
+        return ctx;
+    }
+
     @Test( expected = AssertionError.class )
-    @Ignore
     public void wrongLogin()
         throws Exception
     {
-        BloggerContext ctx = mock( BloggerContext.class );
-        Neo4JBlogService service = new Neo4JBlogService( ctx );
+        Neo4JBlogService service = new Neo4JBlogService( createDefaultMockBloggerContext() );
 
         service.login( null );
     }
