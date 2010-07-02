@@ -34,4 +34,10 @@ public interface BloggerContext
      */
     PrimitiveFactory getPrimitiveFactory();
 
+
+    /**
+     * @return valid  TraversalBatch
+     */
+    NeoBloggerTraversal getSimplifiedTraversal();
+
 }

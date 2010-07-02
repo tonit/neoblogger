@@ -33,14 +33,16 @@ public class DefaultBloggerContext implements BloggerContext
     // Injected Services
     final private GraphDatabaseService m_graphService;
     final private PrimitiveFactory m_primitiveFactory;
+    final private NeoBloggerTraversal m_traversalHelper;
 
-    public DefaultBloggerContext( GraphDatabaseService service, PrimitiveFactory primitiveFactory )
+    public DefaultBloggerContext( GraphDatabaseService service, PrimitiveFactory primitiveFactory, NeoBloggerTraversal traversalHelper )
     {
         m_graphService = service;
         m_refAuthors = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.AUTHORS, Direction.OUTGOING ).getEndNode();
         m_refBlogs = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.BLOGS, Direction.OUTGOING ).getEndNode();
         m_refArticles = m_graphService.getReferenceNode().getSingleRelationship( BloggerRelationship.BLOGS, Direction.OUTGOING ).getEndNode();
         m_primitiveFactory = primitiveFactory;
+        m_traversalHelper = traversalHelper;
     }
 
     @Override
@@ -71,5 +73,11 @@ public class DefaultBloggerContext implements BloggerContext
     public PrimitiveFactory getPrimitiveFactory()
     {
         return m_primitiveFactory;
+    }
+
+    @Override
+    public NeoBloggerTraversal getSimplifiedTraversal()
+    {
+        return m_traversalHelper;
     }
 }

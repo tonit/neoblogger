@@ -22,7 +22,6 @@ import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
 import com.neoblogger.store.neo4j.primitive.AuthorImpl;
 import com.neoblogger.store.neo4j.util.BloggerTypeAwareAdapterIterable;
-import com.neoblogger.store.neo4j.util.TraversalHelper;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -83,7 +82,7 @@ public class Neo4JBlogService implements BlogService
     public Iterable<Blog> getBlogs()
         throws NeoBloggerAuthorizationException
     {
-        return new BloggerTypeAwareAdapterIterable<Position, Blog>( Blog.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( m_context.getBlogReferenceNode(), TraversalHelper.directChilds( Direction.OUTGOING, BloggerRelationship.BLOG ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Blog>( Blog.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( m_context.getBlogReferenceNode(), m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.BLOG ) ) );
     }
 
     /**
@@ -93,6 +92,7 @@ public class Neo4JBlogService implements BlogService
     public AuthorizedBlogService login( Author author )
         throws NeoBloggerAuthorizationException
     {
+        assert ( author != null ) : "Author should not be null";
         return new Neo4JAuthorizedBlogService( m_context, author );
     }
 

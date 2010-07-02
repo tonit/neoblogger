@@ -104,14 +104,14 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     public Iterable<Article> getArticles()
     {
         Node authorNode = m_context.getPrimitiveFactory().get( m_author );
-        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( authorNode, TraversalHelper.directChilds( Direction.OUTGOING, BloggerRelationship.CREATED ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( authorNode, m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.CREATED ) ) );
     }
 
     @Override
     public Iterable<Article> getArticles( Blog blog )
     {
         Node blogNode = m_context.getPrimitiveFactory().get( blog );
-        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), TraversalHelper.traverse( blogNode, TraversalHelper.directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( blogNode, m_context.getSimplifiedTraversal().directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
     }
 
     @Override

@@ -15,7 +15,7 @@
     <properties>
         <namespace>com.neoblogger</namespace>
         <dependency.version.junit>4.8.1</dependency.version.junit>
-        <dependency.version.mockito>1.8.1</dependency.version.mockito>
+        <dependency.version.mockito>1.8.5</dependency.version.mockito>
         <dependency.version.discovery>0.4</dependency.version.discovery>
         <dependency.version.logging>1.1.1</dependency.version.logging>
     </properties>

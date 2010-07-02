@@ -17,6 +17,7 @@ package com.neoblogger.store.neo4j;
 
 import com.neoblogger.api.BlogService;
 import com.neoblogger.api.ServiceFactory;
+import com.neoblogger.store.neo4j.util.NeoBloggerTraversalImpl;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -46,25 +47,7 @@ public class Neo4JBloggerFactory implements ServiceFactory
         if( m_graphDb == null )
         {
 
-            LOG.debug( "Creating new DB instance." );
-            m_graphDb = new EmbeddedGraphDatabase( DB_FOLDER );
-            if( clear )
-            {
-                clear();
-            }
-
-            Transaction tx = m_graphDb.beginTx();
-            try
-            {
-                prepareReferenceNode( BloggerRelationship.AUTHORS );
-                prepareReferenceNode( BloggerRelationship.BLOGS );
-                prepareReferenceNode( BloggerRelationship.ARTICLES );
-
-                tx.success();
-            } finally
-            {
-                tx.finish();
-            }
+            initDB( clear );
         }
         else
         {
@@ -72,10 +55,46 @@ public class Neo4JBloggerFactory implements ServiceFactory
             LOG.warn( "Reusing DB instance." );
 
         }
-        BloggerContext ctx = new DefaultBloggerContext( m_graphDb, new DefaultPrimitiveFactory(m_graphDb) );
+        return new Neo4JBlogService( createDefaultBloggerContext() );
 
-        return new Neo4JBlogService( ctx );
+    }
 
+    private void initDB( boolean clear )
+    {
+        LOG.debug( "Creating new DB instance." );
+        m_graphDb = new EmbeddedGraphDatabase( DB_FOLDER );
+        if( clear )
+        {
+            clear();
+        }
+
+        Transaction tx = m_graphDb.beginTx();
+        try
+        {
+            prepareReferenceNode( BloggerRelationship.AUTHORS );
+            prepareReferenceNode( BloggerRelationship.BLOGS );
+            prepareReferenceNode( BloggerRelationship.ARTICLES );
+
+            tx.success();
+        } finally
+        {
+            tx.finish();
+        }
+    }
+
+    private DefaultBloggerContext createDefaultBloggerContext()
+    {
+        return new DefaultBloggerContext( m_graphDb, createDefaultPrimitiveFactory(), createDefaultTraversalHelper() );
+    }
+
+    private DefaultPrimitiveFactory createDefaultPrimitiveFactory()
+    {
+        return new DefaultPrimitiveFactory( m_graphDb );
+    }
+
+    private NeoBloggerTraversal createDefaultTraversalHelper()
+    {
+        return new NeoBloggerTraversalImpl();
     }
 
     private void prepareReferenceNode( BloggerRelationship t )
