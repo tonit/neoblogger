@@ -27,6 +27,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Position;
 
+import static com.neoblogger.store.neo4j.util.TraversalHelper.*;
+
 /**
  * Neo4J based BlogService
  */
@@ -88,7 +90,7 @@ public class Neo4JBlogService implements BlogService
     public Iterable<Blog> getBlogs()
         throws NeoBloggerAuthorizationException
     {
-        return new BloggerTypeAwareAdapterIterable<Position, Blog>( Blog.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( m_context.getBlogReferenceNode(), m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.BLOG ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Blog>( Blog.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( m_context.getBlogReferenceNode(), m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.BLOG, ignoreSingleNodeFilter( m_context.getBlogReferenceNode() ) ) ) );
     }
 
     /**

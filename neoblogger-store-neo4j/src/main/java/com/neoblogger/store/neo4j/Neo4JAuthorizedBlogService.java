@@ -21,21 +21,18 @@ import com.neoblogger.api.primitive.Article;
 import com.neoblogger.api.primitive.Author;
 import com.neoblogger.api.primitive.Blog;
 import com.neoblogger.api.primitive.BloggerPrimitive;
-import com.neoblogger.store.neo4j.primitive.ArticleImpl;
-import com.neoblogger.store.neo4j.primitive.BlogImpl;
 import com.neoblogger.store.neo4j.util.BloggerTypeAwareAdapterIterable;
-import com.neoblogger.store.neo4j.util.TraversalHelper;
+import org.neo4j.commons.Predicate;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Position;
-import org.neo4j.graphdb.traversal.PruneEvaluator;
-import org.neo4j.graphdb.traversal.ReturnFilter;
 import org.neo4j.kernel.TraversalFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.neoblogger.store.neo4j.util.TraversalHelper.*;
 
 /**
  * Neo4J based authorized service layer.
@@ -104,14 +101,18 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
     public Iterable<Article> getArticles()
     {
         Node authorNode = m_context.getPrimitiveFactory().get( m_author );
-        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( authorNode, m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.CREATED ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(),
+                                                                       m_context.getSimplifiedTraversal().traverse( authorNode, m_context.getSimplifiedTraversal().directChilds( Direction.OUTGOING, BloggerRelationship.CREATED, ignoreSingleNodeFilter( authorNode ) ) )
+        );
     }
 
     @Override
     public Iterable<Article> getArticles( Blog blog )
     {
         Node blogNode = m_context.getPrimitiveFactory().get( blog );
-        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(), m_context.getSimplifiedTraversal().traverse( blogNode, m_context.getSimplifiedTraversal().directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO ) ) );
+        return new BloggerTypeAwareAdapterIterable<Position, Article>( Article.class, m_context.getPrimitiveFactory(),
+                                                                       m_context.getSimplifiedTraversal().traverse( blogNode, m_context.getSimplifiedTraversal().directChilds( Direction.INCOMING, BloggerRelationship.PUBLISHED_TO, ignoreSingleNodeFilter( blogNode ) ) )
+        );
     }
 
     @Override
@@ -127,12 +128,21 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
         Transaction tx = m_context.getDatabaseService().beginTx();
         try
         {
-            Node node = m_context.getPrimitiveFactory().get( article );
+            final Node node = m_context.getPrimitiveFactory().get( article );
 
             for( Position p : TraversalFactory.createTraversalDescription()
                 .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
                 .prune( TraversalFactory.pruneAfterDepth( 1 ) )
-                .filter( ReturnFilter.ALL_BUT_START_NODE )
+                .filter( new Predicate<Position>()
+                {
+
+                    @Override
+                    public boolean accept( Position item )
+                    {
+                        return ( item.node() != node );
+                    }
+                }
+                )
                 .traverse( node ) )
             {
                 Node n = p.node();
@@ -174,4 +184,6 @@ public class Neo4JAuthorizedBlogService implements AuthorizedBlogService
 
         return article;
     }
+
+
 }

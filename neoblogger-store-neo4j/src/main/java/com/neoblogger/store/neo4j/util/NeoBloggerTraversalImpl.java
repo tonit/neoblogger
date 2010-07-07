@@ -18,26 +18,26 @@ package com.neoblogger.store.neo4j.util;
 import java.util.Iterator;
 import com.neoblogger.store.neo4j.BloggerRelationship;
 import com.neoblogger.store.neo4j.NeoBloggerTraversal;
+import org.neo4j.commons.Predicate;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.traversal.Position;
-import org.neo4j.graphdb.traversal.ReturnFilter;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.TraversalFactory;
 
 /**
- * 
+ *
  */
 public class NeoBloggerTraversalImpl implements NeoBloggerTraversal
 {
+
     @Override
-  public TraversalDescription directChilds( Direction direction, final BloggerRelationship type )
+    public TraversalDescription directChilds( Direction direction, final BloggerRelationship type, Predicate<Position> filter )
     {
         return TraversalFactory.createTraversalDescription()
             .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
             .prune( TraversalFactory.pruneAfterDepth( 1 ) )
-
-            .filter( ReturnFilter.ALL_BUT_START_NODE )
+            .filter( filter )
             .relationships( type, direction );
 
     }

@@ -15,11 +15,26 @@
  */
 package com.neoblogger.store.neo4j.util;
 
+import org.neo4j.commons.Predicate;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.traversal.Position;
+
 /**
  *
  */
 public class TraversalHelper
 {
 
-  
+    public static Predicate<Position> ignoreSingleNodeFilter( final Node node )
+    {
+        return new Predicate<Position>()
+        {
+            @Override
+            public boolean accept( Position item )
+            {
+                return ( item.node() != node );
+            }
+        };
+    }
+
 }

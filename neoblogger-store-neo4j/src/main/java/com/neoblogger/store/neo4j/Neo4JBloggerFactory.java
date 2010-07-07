@@ -23,11 +23,12 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Position;
-import org.neo4j.graphdb.traversal.ReturnFilter;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.TraversalFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.neoblogger.store.neo4j.util.TraversalHelper.*;
 
 /**
  * NeoJ specifc, threadsafe, lazily instantiating, stateful factory with a underlying EmbeddedGraphDatabase.
@@ -135,7 +136,7 @@ public class Neo4JBloggerFactory implements ServiceFactory
 
                 for( Position p : TraversalFactory.createTraversalDescription()
                     .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
-                    .filter( ReturnFilter.ALL_BUT_START_NODE )
+                    .filter( ignoreSingleNodeFilter( referenceNode ) )
                     .traverse( referenceNode ) )
                 {
                     Node n = p.node();

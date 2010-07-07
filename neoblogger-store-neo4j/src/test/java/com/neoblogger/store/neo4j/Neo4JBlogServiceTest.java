@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import com.neoblogger.api.AuthorizedBlogService;
 import com.neoblogger.api.primitive.Author;
 import org.junit.Test;
+import org.neo4j.commons.Predicate;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -81,6 +82,7 @@ public class Neo4JBlogServiceTest
 
     }
 
+    @SuppressWarnings( "unchecked" )
     private BloggerContext createDefaultMockBloggerContext()
     {
         BloggerContext ctx = mock( BloggerContext.class );
@@ -96,7 +98,7 @@ public class Neo4JBlogServiceTest
         NeoBloggerTraversal traversalHelper = mock( NeoBloggerTraversal.class );
         TraversalDescription traversalDescription = mock( TraversalDescription.class );
 
-        when( traversalHelper.directChilds( any( Direction.class ), any( BloggerRelationship.class ) ) ).thenReturn( traversalDescription );
+        when( traversalHelper.directChilds( any( Direction.class ), any( BloggerRelationship.class ), any ( Predicate.class) ) ).thenReturn( traversalDescription );
         when( traversalHelper.traverse( any( Node.class ), any( TraversalDescription.class ) ) ).thenReturn( new ArrayList<Position>() );
 
         when( node.createRelationshipTo( any( Node.class ), any( RelationshipType.class ) ) ).thenReturn( relationship );

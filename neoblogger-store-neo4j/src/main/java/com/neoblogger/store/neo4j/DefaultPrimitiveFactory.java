@@ -29,7 +29,11 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 /**
  * Factory for Neo4J backed primitives.
  * Is able to convert Primitives back and forth as long as they are produced by {@link Neo4JBlogService) and its products.
+ *
+ * This factory looks like quite common when working with neo4j as suggested by the Design Guide.
+ * However implementation needs to be registry based of cause and much more elaborate.
  */
+@SuppressWarnings( "unchecked" )
 public class DefaultPrimitiveFactory implements PrimitiveFactory
 {
 

@@ -16,14 +16,12 @@
 package com.neoblogger.store.neo4j.util;
 
 import java.util.Iterator;
-import com.neoblogger.api.primitive.Blog;
 import com.neoblogger.store.neo4j.BloggerRelationship;
-import com.neoblogger.store.neo4j.PrimitiveFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.traversal.Position;
-import org.neo4j.graphdb.traversal.ReturnFilter;
-import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.TraversalFactory;
+
+import static com.neoblogger.store.neo4j.util.TraversalHelper.*;
 
 /**
  * Convenience Class for converting Iterable<S> to Iterable<T>
@@ -68,8 +66,6 @@ public abstract class AdapterIterable<S, T> implements Iterable<T>
 
     public abstract T convert( S source );
 
-  
-
     static public Iterable<Node> iter( final Node startNode, final BloggerRelationship type )
     {
         return new Iterable<Node>()
@@ -84,7 +80,7 @@ public abstract class AdapterIterable<S, T> implements Iterable<T>
                     Iterator<Position> iterator = TraversalFactory.createTraversalDescription()
                         .sourceSelector( TraversalFactory.postorderBreadthFirstSelector() )
                         .prune( TraversalFactory.pruneAfterDepth( 1 ) )
-                        .filter( ReturnFilter.ALL_BUT_START_NODE )
+                        .filter( ignoreSingleNodeFilter( startNode ) )
                         .relationships( type )
                         .traverse( startNode ).iterator();
 
